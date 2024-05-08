@@ -1,8 +1,8 @@
-﻿using catalog_service_2.Services;
-using catalog_service_v2.Models.DomainModels;
+﻿using catalog_service_v2.Models.DomainModels;
+using catalog_service_v2.Services;
 using Microsoft.AspNetCore.Mvc;
 
-namespace catalog_service_2.Controllers;
+namespace catalog_service_v2.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
@@ -16,6 +16,21 @@ public class CatalogController : ControllerBase
         _productService = productService;
     }
 
+    [HttpGet]
+    public async Task<IActionResult> GetAll(
+        [FromQuery] string? search,
+        [FromQuery] int? page,
+        [FromQuery] int? pageSize,
+        [FromQuery] string? sort
+        )
+    {
+        var products = await _productService.GetProductsAsync(page, pageSize, search, sort);
+        
+        // Make products into a list of ProductDto
+        return Ok(products);
+    }
+    
+    // Test Functions
     [HttpPost("test-post")]
     public IActionResult TestPost([FromBody] Product product)
     {
@@ -43,20 +58,6 @@ public class CatalogController : ControllerBase
     {
         var count = await _productService.GetProductCountAsync();
         return Ok(new { count });
-    }
-
-    [HttpGet]
-    public async Task<IActionResult> GetAll(
-        [FromQuery] string? search,
-        [FromQuery] int? page,
-        [FromQuery] int? pageSize,
-        [FromQuery] string? sort
-        )
-    {
-        var products = await _productService.GetProductsAsync(page, pageSize, search, sort);
-        
-        // Make products into a list of ProductDto
-        return Ok(products);
     }
     
 }

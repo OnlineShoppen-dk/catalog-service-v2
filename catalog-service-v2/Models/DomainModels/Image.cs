@@ -1,4 +1,4 @@
-﻿namespace catalog_service_v2.Models;
+﻿namespace catalog_service_v2.Models.DomainModels;
 
 public class Image
 {

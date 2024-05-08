@@ -2,22 +2,12 @@
 using Elastic.Clients.Elasticsearch;
 using Elastic.Transport;
 
-namespace catalog_service_2.Configuration;
+namespace catalog_service_v2.Configuration;
 
 public class ElasticSearchConfig
 {
     public static async void Configure(IServiceCollection services, string userName, string password)
     {
-        // ElasticSearch
-        /* If run through docker-compose, use the following nodes
-        var nodes = new Uri[]
-        {
-            new Uri("http://elasticsearch1:9200"),
-            new Uri("http://elasticsearch2:9200"),
-            new Uri("http://elasticsearch3:9200")
-        };
-        */
-        
         var nodes = new Uri[]
         {
             new Uri("http://localhost:9200"),
@@ -32,7 +22,7 @@ public class ElasticSearchConfig
                 .IndexName("product-logs")
             )
             // Setup
-            .Authentication(new BasicAuthentication("elastic", "changeme"))
+            .Authentication(new BasicAuthentication(userName, password))
             .EnableDebugMode() // Optional: Enables detailed logging for debugging
             .PrettyJson() // Optional: Formats JSON output to be more readable
             .RequestTimeout(TimeSpan.FromMinutes(2));
@@ -40,7 +30,7 @@ public class ElasticSearchConfig
 
         var client = new ElasticsearchClient(settings);
         
-        var settings2 = client.Indices.CreateAsync("product-logs-2");
+        var settings2 = client.Indices.CreateAsync("product-logs");
 
         // Services
         services.AddSingleton(client);

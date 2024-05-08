@@ -1,7 +1,7 @@
 ﻿using catalog_service_v2.Models.DomainModels;
 using Elastic.Clients.Elasticsearch;
 
-namespace catalog_service_2.Services;
+namespace catalog_service_v2.Services;
 
 public interface IProductService
 {

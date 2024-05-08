@@ -1,7 +1,7 @@
-﻿using catalog_service_2.Configuration;
+﻿using catalog_service_v2.Configuration;
 using Microsoft.OpenApi.Models;
 
-namespace catalog_service_2;
+namespace catalog_service_v2;
 
 public class Startup
 {

@@ -1,6 +1,6 @@
-﻿using catalog_service_2.Services;
+﻿using catalog_service_v2.Services;
 
-namespace catalog_service_2.Configuration;
+namespace catalog_service_v2.Configuration;
 
 public class ServiceConfig
 {
