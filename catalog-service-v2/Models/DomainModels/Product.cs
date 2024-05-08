@@ -27,7 +27,7 @@ public class ElasticSearchProduct
     public decimal price { get; set; }
     public int stock { get; set; }
     public int sold { get; set; }
-    public DateTime createdAat { get; set; }
+    public DateTime createdAt { get; set; }
     public DateTime updatedAt { get; set; }
     public bool disabled { get; set; }
     public string imageId { get; set; }

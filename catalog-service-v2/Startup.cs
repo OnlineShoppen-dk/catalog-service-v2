@@ -1,4 +1,5 @@
 ﻿using catalog_service_v2.Configuration;
+using catalog_service_v2.Services;
 using Microsoft.OpenApi.Models;
 
 namespace catalog_service_v2;
@@ -15,8 +16,13 @@ public class Startup
     public void ConfigureServices(IServiceCollection services)
     {
         /* Gets the necessary configuration values, if run locally gets local values, README.md for setting those values */
-        var elasticSearchUserName = "elastic";
-        var elasticSearchPassword = "changeme";
+        var elasticSearchUserName = Environment.GetEnvironmentVariable("ELASTICSEARCH_USERNAME");
+        var elasticSearchPassword = Environment.GetEnvironmentVariable("ELASTICSEARCH_PASSWORD");
+        
+        if (elasticSearchUserName == null || elasticSearchPassword == null)
+        {
+            throw new Exception("ElasticSearch username and password not set.");
+        }
         
         // Configurations for the services
         ElasticSearchConfig.Configure(services, elasticSearchUserName, elasticSearchPassword);
