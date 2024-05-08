@@ -19,4 +19,4 @@ COPY --from=build-env /app/out .
 
 # Set the environment to Development
 ENV ASPNETCORE_ENVIRONMENT=Development
-ENTRYPOINT ["dotnet", "catalog-service-2.dll"]
+ENTRYPOINT ["dotnet", "catalog-service-v2.dll"]
