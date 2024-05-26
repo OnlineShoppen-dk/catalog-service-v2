@@ -19,7 +19,7 @@ public class ProductService : IProductService
 {
     private readonly ElasticsearchClient _client;
 
-    private const string IndexName = "product-logs";
+    private readonly string _productIndex;
 
     /// <summary>
     /// Get all products from Elasticsearch
@@ -44,7 +44,7 @@ public class ProductService : IProductService
         var size = pageSize ?? defaultPageSize;
         
         var response = await _client.SearchAsync<ElasticSearchProduct>(s => s
-            .Index(IndexName)
+            .Index(_productIndex)
             .From(from)
             .Size(size)
             .Query(q => q
@@ -94,7 +94,7 @@ public class ProductService : IProductService
     public async Task<int> GetProductCountAsync()
     {
         var count = await _client.CountAsync(c => c
-            .Index(IndexName)
+            .Index(_productIndex)
             .Query(q => q.MatchAll()));
         return (int)count.Count;
     }
@@ -103,6 +103,7 @@ public class ProductService : IProductService
     public ProductService(ElasticsearchClient client)
     {
         _client = client;
+        _productIndex = Environment.GetEnvironmentVariable("PRODUCT_INDEX") ?? "products";
     }
 }
 

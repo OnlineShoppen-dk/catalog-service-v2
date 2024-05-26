@@ -8,6 +8,8 @@ public class ElasticSearchConfig
 {
     public static async void Configure(IServiceCollection services, string userName, string password)
     {
+        var productQueue = Environment.GetEnvironmentVariable("PRODUCT_INDEX") ?? "products";
+        
         var nodes = new Uri[]
         {
             new Uri("http://elasticsearch:9200"),
@@ -19,7 +21,7 @@ public class ElasticSearchConfig
         var settings = new ElasticsearchClientSettings(pool)
             // Default Mapping
             .DefaultMappingFor<Product>(m => m
-                .IndexName("product-logs")
+                .IndexName(productQueue)
             )
             // Setup
             .Authentication(new BasicAuthentication(userName, password))
@@ -30,7 +32,7 @@ public class ElasticSearchConfig
 
         var client = new ElasticsearchClient(settings);
         
-        var settings2 = client.Indices.CreateAsync("product-logs");
+        var settings2 = client.Indices.CreateAsync(productQueue);
 
         // Services
         services.AddSingleton(client);
