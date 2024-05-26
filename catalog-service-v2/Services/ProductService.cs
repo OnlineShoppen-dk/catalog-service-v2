@@ -49,7 +49,7 @@ public class ProductService : IProductService
             .Size(size)
             .Query(q => q
                 .Wildcard(w => w
-                    .Field(f => f.name)
+                    .Field(f => f.Name)
                     .Value($"*{search}*")
                     .CaseInsensitive(true)
                 ))

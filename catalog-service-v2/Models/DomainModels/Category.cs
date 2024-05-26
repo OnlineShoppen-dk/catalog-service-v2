@@ -9,7 +9,7 @@ public class Category
 
 public class ElasticSearchCategory
 {
-    public int id { get; set; }
-    public string name { get; set; } = null!;
-    public string description { get; set; } = null!;
+    public int Id { get; set; }
+    public string Name { get; set; } = null!;
+    public string Description { get; set; } = null!;
 }
