@@ -1,11 +1,12 @@
 ﻿using catalog_service_v2.Models.DomainModels;
 using Elastic.Clients.Elasticsearch;
+using Elastic.Clients.Elasticsearch.QueryDsl;
 
 namespace catalog_service_v2.Services;
 
 public interface IProductService
 {
-    public Task<IEnumerable<ElasticSearchProduct>> GetProductsAsync(int? page, int? pageSize, string? search, string? sort);
+    public Task<IEnumerable<ElasticSearchProduct>> GetProductsAsync(int? page, int? pageSize, string? search, string? sort, int? minPrice, int? maxPrice);
     public Task AddProduct(Product product);
 
 
@@ -28,7 +29,7 @@ public class ProductService : IProductService
     ///  - From() : Skip the first n results
     ///  - Size() : Limit the number of results
     /// </summary>
-    public async Task<IEnumerable<ElasticSearchProduct>> GetProductsAsync(int? page, int? pageSize, string? search, string? sort)
+    public async Task<IEnumerable<ElasticSearchProduct>> GetProductsAsync(int? page, int? pageSize, string? search, string? sort, int? minPrice, int? maxPrice)
     {
         // Setup Pagination, optimize later
         const int defaultPage = 1;
@@ -44,11 +45,10 @@ public class ProductService : IProductService
         }
 
         var size = pageSize ?? defaultPageSize;
-        
+
         var response = await _client.SearchAsync<ElasticSearchProduct>(s => s
             .Index(_productIndex)
-            .From(from)
-            .Size(size)
+            .Size(10000)
             .Query(q => q
                 .Wildcard(w => w
                     .Field(f => f.Name)
@@ -59,7 +59,32 @@ public class ProductService : IProductService
 
         if (response.IsValidResponse)
         {
-            return response.Documents;
+            IEnumerable<ElasticSearchProduct> products = response.Documents;
+
+            if (minPrice != null) products = products.Where(p => p.Price >= minPrice);
+            if (maxPrice != null) products = products.Where(p => p.Price <= maxPrice);
+
+            switch (sort)
+            {
+                case "name_asc":
+                    products = products.OrderBy(a => a.Name);
+                    break;
+                case "name_desc":
+                    products = products.OrderByDescending(a => a.Name);
+                    break;
+                case "price_asc":
+                    products = products.OrderBy(a => a.Price);
+                    break;
+                case "price_desc":
+                    products = products.OrderByDescending(a => a.Price);
+                    break;
+                default:
+                    break;
+            }
+
+            products = products.Skip(from).Take(size);
+
+            return products;
         }
         throw new Exception("Search failed or no results found");
     }
@@ -102,23 +127,23 @@ public class ProductService : IProductService
     }
 
     public async Task<Product> GetProductAsync(int productId)
-        {
-            var searchResponse = await _client.SearchAsync<Product>(s => s
-                .Index(_productIndex)
-                .Query(q => q
-                    .Match(m => m
-                        .Field(f => f.Id)
-                        .Query(productId.ToString())
-                    )
+    {
+        var searchResponse = await _client.SearchAsync<Product>(s => s
+            .Index(_productIndex)
+            .Query(q => q
+                .Match(m => m
+                    .Field(f => f.Id)
+                    .Query(productId.ToString())
                 )
-            );
+            )
+        );
 
-            if (searchResponse.Documents.Any())
-            {
-                return searchResponse.Documents.First();
-            }
-            return null; // Document not found or other issue
+        if (searchResponse.Documents.Any())
+        {
+            return searchResponse.Documents.First();
         }
+        return null; // Document not found or other issue
+    }
 
 
     public ProductService(ElasticsearchClient client)

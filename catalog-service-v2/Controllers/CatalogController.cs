@@ -17,18 +17,20 @@ public class CatalogController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetAll(
-        [FromQuery] string? search,
-        [FromQuery] int? page,
-        [FromQuery] int? pageSize,
-        [FromQuery] string? sort
-        )
-    {
-        var products = await _productService.GetProductsAsync(page, pageSize, search, sort);
-        
-        // Make products into a list of ProductDto
-        return Ok(products);
-    }
+public async Task<IActionResult> GetAll(
+    [FromQuery] string? search,
+    [FromQuery] int? page,
+    [FromQuery] int? pageSize,
+    [FromQuery] string? sort,
+    [FromQuery] int? minPrice,
+    [FromQuery] int? maxPrice
+    )
+{
+    var products = await _productService.GetProductsAsync(page, pageSize, search, sort, minPrice, maxPrice);
+    
+    // Make products into a list of ProductDto
+    return Ok(products);
+}
     
     // Test Functions
     [HttpPost("test-post")]
