@@ -59,5 +59,18 @@ public class CatalogController : ControllerBase
         var count = await _productService.GetProductCountAsync();
         return Ok(new { count });
     }
+
+    [HttpGet("{id}")]
+    public async Task<IActionResult> GetProduct(int id)
+    {
+            
+        var product = await _productService.GetProductAsync(id);
+        if (product != null)
+        {
+            return Ok(product);
+        }
+
+        return NotFound("Product not found.");
+    }    
     
 }

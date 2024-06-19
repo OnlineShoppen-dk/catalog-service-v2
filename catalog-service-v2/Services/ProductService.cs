@@ -13,6 +13,8 @@ public interface IProductService
     public Task<bool> PingAsync();
     // Check product count
     public Task<int> GetProductCountAsync();
+
+    public Task<Product> GetProductAsync(int productId);
 }
 
 public class ProductService : IProductService
@@ -98,6 +100,25 @@ public class ProductService : IProductService
             .Query(q => q.MatchAll()));
         return (int)count.Count;
     }
+
+    public async Task<Product> GetProductAsync(int productId)
+        {
+            var searchResponse = await _client.SearchAsync<Product>(s => s
+                .Index(_productIndex)
+                .Query(q => q
+                    .Match(m => m
+                        .Field(f => f.Id)
+                        .Query(productId.ToString())
+                    )
+                )
+            );
+
+            if (searchResponse.Documents.Any())
+            {
+                return searchResponse.Documents.First();
+            }
+            return null; // Document not found or other issue
+        }
 
 
     public ProductService(ElasticsearchClient client)
